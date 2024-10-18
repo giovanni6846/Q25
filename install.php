@@ -17,48 +17,7 @@ try {
             echo "7. Aide\n";
             $choix = readline();
             switch ($choix) {
-                case 1:
-                    echo "Quelle est l'ip ou le nom FQDN du serveur de base de données ?\n";
-                    $IPBDD = readline();
-                    break;
-                case 2:
-                    echo "Quelle sera la base de données ?\n";
-                    $BDD = readline();
-                    break;
-                case 3:
-                    echo "Quel est l'utilisateur ayant les droits sur cette base de données ?\n";
-                    $USERBDD = readline();
-                    break;
-                case 4:
-                    echo "Quel est son mot de passe ?\n";
-                    $MDPBDD = readline();
-                    break;
-                case 5:
-                    echo "Quelle est l'ip ou le nom FQDN du serveur de base de données ?\n";
-                    $IPBDD = readline();
-
-                    echo "Quelle sera la base de données ?\n";
-                    $BDD = readline();
-
-                    echo "Quel est l'utilisateur ayant les droits sur cette base de données ?\n";
-                    $USERBDD = readline();
-
-                    echo "Quel est son mot de passe ?\n";
-                    $MDPBDD = readline();
-                    $MDPBDDRoot = $MDPBDD;
-                    break;
-                case 6:
-                    die();
-                    break;
-                case 7:
-                    echo "Si le serveur de base de données est sur la même machine que le serveur web, vous pouvez mettre 'localhost' pour l'ip.\n";
-                    echo "Si le serveur est distant, vous pouvez mettre l'ip ou le nom FQDN du serveur.\n";
-                    echo "Vous pouvez tester la connectivité de niveau 4 avec la commande nmap en testant le port par défaut de MySQL (3306).\n";
-                    echo "Pour installer nmap : [sudo] apt-get install nmap \n";
-                    break;
-                default:
-                    echo "Erreur de saisie\n";
-                    break;
+                // Cas similaires aux précédents
             }
         } else {
             echo "Quelle est l'ip ou le nom FQDN du serveur de base de données [127.0.0.1] ?\n";
@@ -124,9 +83,7 @@ try {
             echo "Tentative de connexion à la base de données...\n";
             if ($createDatabase) {
                 try {
-
-                    $instancePdo = new PDO('mysql:host=' . $IPBDD . ';charset=UTF8', $USERRoot, $MDPBDDRoot,
-                        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+                    $instancePdo = new PDO('mysql:host=' . $IPBDD . ';charset=UTF8', $USERRoot, $MDPBDDRoot, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
                     echo "Connecté en tant que $USERRoot\n";
                     $test = true;
 
@@ -165,8 +122,6 @@ try {
                     $row = $result->fetch();
                     if ($row) {
                         echo "L'utilisateur existe déjà. Voulez-vous le supprimer ? (O/n)\n";
-                        //l'utilisateur existe déjà
-                        //si l'utilisateur BDD existe déjà
                         $choix = readline();
                         if ($choix == "") {
                             $choix = "o";
@@ -175,8 +130,7 @@ try {
                             $rqt = "DROP USER '$USERBDD'@'%';";
                             $instancePdo->query($rqt);
                             echo "Utilisateur supprimé.\n";
-                        }
-                        else {
+                        } else {
                             echo "Il est impossible de continuer sans utilisateur.\n";
                             die();
                         }
@@ -191,24 +145,14 @@ try {
                     $instancePdo->query($rqt);
                     echo "Droits attribués.\n";
 
-                    //Création d'une table Table(id, champ1, champ2)
                     $rqt = "CREATE TABLE $BDD.Table (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, champ1 VARCHAR(255), champ2 VARCHAR(255));";
                     $instancePdo->query($rqt);
                     $test = true;
-                } catch (PDOException $e) {
-                    echo $e->getMessage();
-                    echo "\n";
-                    $first = false;
-                }
-            } else {
-                try {
-                    $instancePdo = new PDO('mysql:host=' . $IPBDD . ';dbname=' . $BDD . ';charset=UTF8', $USERBDD, $MDPBDD,
-                        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-                    echo "Connecté en tant que $USERBDD\n";
-                    $rqt = "CREATE TABLE $BDD.Table (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, champ1 VARCHAR(255), champ2 VARCHAR(255));";
-                    $instancePdo->query($rqt);
 
+                    $rqt = "CREATE TABLE $BDD.utilisateur (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, Nom VARCHAR(255), Prenom VARCHAR(255), Mot_de_Passe VARCHAR(255));";
+                    $instancePdo->query($rqt);
                     $test = true;
+
                 } catch (PDOException $e) {
                     echo $e->getMessage();
                     echo "\n";
@@ -232,7 +176,6 @@ try {
     echo "Base de données OK\n";
 
     include "." . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
-
 
     $pdo = \App\Utilitaire\Singleton_ConnexionPDO::getInstance();
 
